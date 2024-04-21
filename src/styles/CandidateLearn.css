@@ -1,0 +1,57 @@
+.learning-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .learning-content {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .learning-menu {
+    flex: 0 0 30%;
+  }
+  
+  .learning-menu h3 {
+    margin-bottom: 10px;
+  }
+  
+  .learning-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .learning-menu li {
+    cursor: pointer;
+    padding: 5px 0;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .learning-main {
+    flex: 0 0 65%;
+  }
+  
+  .learning-main h3 {
+    margin-bottom: 10px;
+  }
+  
+  .learning-main ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .learning-main li {
+    margin-bottom: 5px;
+  }
+  
+  .learning-main a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .learning-main a:hover {
+    text-decoration: underline;
+  }
+  

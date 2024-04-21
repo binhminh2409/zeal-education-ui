@@ -2,6 +2,8 @@
   text-align: center;
 }
 
+@import '~@fortawesome/fontawesome-free/css/all.css';
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -35,4 +37,74 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+/* App.css */
+/* Header.css */
+.header {
+  background-color: #4caf50; /* Green background color */
+  color: #fff; /* White text color */
+  padding: 20px;
+}
+
+.header-title {
+  font-size: 24px;
+}
+
+.btn-primary {
+  background-color: #05883b; /* Darker green button color */
+  border-color: #afefc0; /* Darker green button border color */
+}
+
+.btn-primary:hover {
+  background-color: #005122; /* Dark green button color on hover */
+  border-color: #ffffff; /* Dark green button border color on hover */
+}
+
+
+.footer {
+  background-color: #c8e6c9; /* Light green */
+  padding: 20px 0;
+  text-align: center;
+}
+
+.footer-text {
+  color: #333; /* Dark gray */
+}
+
+/* Add this to your existing CSS file or create a new one */
+
+/* Dropdown button */
+.dropdown-toggle {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  background-color: #f8f9fa;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* Dropdown menu items */
+.dropdown-item {
+  color: #212529;
+}
+
+/* Dropdown menu items on hover */
+.dropdown-item:hover {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* Active dropdown menu item */
+.dropdown-item.active, .dropdown-item:active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+/* Adjust dropdown menu position */
+.dropdown-menu {
+  margin-top: 0.5rem;
 }

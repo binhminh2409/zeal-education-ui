@@ -1,24 +1,66 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
+import Courses from './components/Courses';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './components/Login';
+import Cookies from 'js-cookie';
+import Checkout from './components/Checkout';
+import SignUp from './components/Signup';
+import PrivateRoute from './components/PrivateRoute';
+import CandidateMyAccount from './components/CandidateMyAccount';
+import CandidateLearn from './components/CandidateLearn';
+import CandidateInfoUpdate from './components/CandidateInfoUpdate';
+
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!Cookies.get('token'));
+
+  const handleLogin = () => {
+    // Login logic (set token in cookie)
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    // Logout logic (remove token from cookie)
+    Cookies.remove('token');
+    setIsLoggedIn(false);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Header isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+        <Routes>
+          <Route path="/" element={<Courses />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/signup" element={<SignUp />} />
+
+          <Route path="/my-account" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
+              <CandidateMyAccount />
+            </PrivateRoute>}
+          />
+
+          <Route path="/my-account/info/update" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
+              <CandidateInfoUpdate />
+            </PrivateRoute>}
+          />
+          
+          <Route path="/checkout/:courseId" element={<PrivateRoute isLoggedIn={isLoggedIn}>  
+              <Checkout />
+            </PrivateRoute>}
+          />
+
+          <Route path="/learn/:batchId" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
+              <CandidateLearn />
+            </PrivateRoute>}
+          />
+
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
