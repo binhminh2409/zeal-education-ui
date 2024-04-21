@@ -36,26 +36,14 @@ function App() {
           <Route path="/" element={<Courses />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/my-account" element={<CandidateMyAccount />} />
+            
+          <Route path="/my-account/info/update" element={<CandidateInfoUpdate />} />
+                    
+          <Route path="/checkout/:courseId" element={<Checkout />} />
+            
+          <Route path="/learn/:batchId" element={<CandidateLearn />} />
 
-          <Route path="/my-account" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
-              <CandidateMyAccount />
-            </PrivateRoute>}
-          />
-
-          <Route path="/my-account/info/update" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
-              <CandidateInfoUpdate />
-            </PrivateRoute>}
-          />
-          
-          <Route path="/checkout/:courseId" element={<PrivateRoute isLoggedIn={isLoggedIn}>  
-              <Checkout />
-            </PrivateRoute>}
-          />
-
-          <Route path="/learn/:batchId" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
-              <CandidateLearn />
-            </PrivateRoute>}
-          />
 
         </Routes>
         <Footer />

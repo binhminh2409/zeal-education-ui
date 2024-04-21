@@ -2,6 +2,8 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/Courses.css'; 
 import { useNavigate } from 'react-router-dom';
+import TestImage from '../images/test.jpg';
+
 
 const Courses = () => {
   const navigate = useNavigate();
@@ -30,8 +32,8 @@ const Courses = () => {
     },
   ];
 
-  const handleBuy = (courseId) => {
-    navigate(`/checkout/${courseId}`);
+  const handleBuy = () => {
+    navigate(`/checkout/`);
   };
 
   return (
@@ -41,14 +43,14 @@ const Courses = () => {
         {courses.map(course => (
           <div key={course.id} className="col-lg-4 col-md-6 mb-4">
             <div className="card h-100 course-card">
-              <img src={`process.env.REACT_APP_STATIC_FOLDER_URL/images/${course.imageName}`} className="card-img-top course-image" alt="Course" />  // Updated image source
+            <img src={TestImage} className="card-img-top course-image" alt="Course" />
               <div className="card-body">
                 <h5 className="card-title course-title">{course.name}</h5>
                 <p className="card-text course-description">{course.description}</p>
               </div>
               <div className="card-footer d-flex justify-content-between align-items-center">
                 <small className="text-muted">Price: <span className="badge bg-success ms-2 course-price">{course.price}</span></small>
-                <button className="btn btn-primary" onClick={() => handleBuy(courseId)}>Buy</button>
+                <button className="btn btn-primary" onClick={() => handleBuy()}>Buy</button>
               </div>
             </div>
           </div>
