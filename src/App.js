@@ -39,7 +39,22 @@ function App() {
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/details/:courseId" element={<CourseDetails />} />
-          <Route path="/admin" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
+          <Route path="/faculty" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
+              <FacultyHomePage />
+            </PrivateRoute>}
+          />
+
+          <Route path="/faculty/course-details" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
+              <FacultyHomePage />
+            </PrivateRoute>}
+          />
+
+          <Route path="/faculty/batch-details" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
+              <FacultyHomePage />
+            </PrivateRoute>}
+          />
+
+          <Route path="/user-details" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
               <FacultyHomePage />
             </PrivateRoute>}
           />

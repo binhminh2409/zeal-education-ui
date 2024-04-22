@@ -3,12 +3,11 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/FacultyHomePage.css';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const FacultyHomePage = () => {
-    const navigate = useNavigate();
     const [userEnquiries,
         setUserEnquiries] = useState([]);
     const [batchEnquiries,
@@ -19,8 +18,6 @@ const FacultyHomePage = () => {
         setCourses] = useState([]);
     const [batches,
         setBatches] = useState([]);
-    const [enrollments,
-        setEnrollments] = useState([]);
     const [selectedMenu,
         setSelectedMenu] = useState('user');
 
@@ -48,10 +45,6 @@ const FacultyHomePage = () => {
                 const courseEnquiriesResponse = await axiosInstance.get('/admin/course-enquiry');
                 setCourseEnquiries(courseEnquiriesResponse.data);
 
-                // Fetch enrollments
-                const enrollmentResponse = await axiosInstance.get('/admin/enrollment/all');
-                setEnrollments(enrollmentResponse.data);
-
                 // Fetch batches
                 const batchesResponse = await axiosInstance.get('/admin/batch');
                 setBatches(batchesResponse.data);
@@ -68,13 +61,43 @@ const FacultyHomePage = () => {
         fetchEnquiries();
     }, []);
 
+    const formatDate = (dateString) => {
+        const dateObject = new Date(dateString);
+
+        const year = dateObject.getFullYear();
+        const month = String(dateObject.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObject.getDate()).padStart(2, '0');
+        const hours = String(dateObject.getHours()).padStart(2, '0');
+        const minutes = String(dateObject.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    };
+
     const handleMenuClick = (menu) => {
         setSelectedMenu(menu);
     };
 
-    const onClickNavigate = (url) => {
-        navigate(url);
-    }
+    const calculateDaysLeft = (startDate, endDate) => {
+        const now = new Date(); // Current date
+
+        // If now is before the start date, return "Batch not started"
+        if (now < new Date(startDate)) {
+            return "Batch not started";
+        }
+
+        // If now is after the end date, return "Batch ended"
+        if (now > new Date(endDate)) {
+            return "Batch ended";
+        }
+
+        // Calculate the difference in days between now and the end date
+        const end = new Date(endDate);
+        const differenceInTime = end.getTime() - now.getTime();
+        const differenceInDays = Math.ceil(differenceInTime / (1000 * 3600 * 24));
+
+        // Return the difference in days
+        return differenceInDays;
+    };
 
     const renderEnquiries = () => {
         switch (selectedMenu) {
@@ -82,73 +105,125 @@ const FacultyHomePage = () => {
                 return (
                     <div className="enquiries-section">
                         <h2>User Enquiries</h2>
-                        <ul>
-                            {userEnquiries.map(enquiry => (
-                                <li key={enquiry.id}>
-                                    Event: {enquiry.description}
-                                    <Link to={`user-details/${enquiry.userId}`}>See new user details</Link>
-                                </li>
-                            ))}
-                        </ul>
+                        <table className="faculty-table">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {userEnquiries.map(enquiry => (
+                                    <tr key={enquiry.id}>
+                                        <td>{enquiry.description}</td>
+                                        <td>
+                                            <Link to={`user-details/${enquiry.userId}`}>See New User Details</Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
                     </div>
                 );
             case 'batch-enquiry':
                 return (
                     <div className="enquiries-section">
                         <h2>Batch Enquiries</h2>
-                        <ul>
-                            {batchEnquiries.map(enquiry => (
-                                <li key={enquiry.id}>
-                                    Batch id: {enquiry.batchId}
-                                    <br></br>
-                                    Event: {enquiry.description}
-                                    <Link to={`batch-details/${enquiry.batchId}`}>See batch details</Link>
-                                </li>
-                            ))}
-                        </ul>
+                        <table className="faculty-table">
+                            <thead>
+                                <tr>
+                                    <th>Batch ID</th>
+                                    <th>Event</th>
+                                    <th>Date</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {batchEnquiries.map(enquiry => (
+                                    <tr key={enquiry.id}>
+                                        <td>{enquiry.batchId}</td>
+                                        <td>{enquiry.description}</td>
+                                        <td>{formatDate(enquiry.createdDate)}</td>
+                                        <td>
+                                            <Link to={`batch-details/${enquiry.batchId}`}>See Batch Details</Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
                     </div>
                 );
             case 'course-enquiry':
                 return (
                     <div className="enquiries-section">
                         <h2>Course Enquiries</h2>
-                        <ul>
-                            {courseEnquiries.map(enquiry => (
-                                <li key={enquiry.id}>
-                                    Course id: {enquiry.CourseId}
-                                    <br></br>
-                                    Event: {enquiry.description}
-                                    <button onClick={() => onClickNavigate(`course-details/${enquiry.CourseId}`)}>See course details</button>
-                                </li>
-                            ))}
-                        </ul>
+                        <table className="faculty-table">
+                            <thead>
+                                <tr>
+                                    <th>Course ID</th>
+                                    <th>Event</th>
+                                    <th>Date</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {courseEnquiries.map(enquiry => (
+                                    <tr key={enquiry.id}>
+                                        <td>{enquiry.CourseId}</td>
+                                        <td>{formatDate(enquiry.createdDate)}</td>
+                                        <td>{enquiry.description}</td>
+                                        <td>
+                                            <Link to={`course-details/${enquiry.CourseId}`}>See Course Details</Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
                     </div>
                 )
             case 'enrollment':
                 return (
                     <div className="enquiries-section">
                         <h2>Enrollments</h2>
-                        <ul>
-                            {enrollments.map(enrollment => (
-                                <li key={enrollment.id}>
-                                    Amount: {enrollment.amount}
-                                    <br></br>
-                                    at {enrollment.createdDate}
-                                </li>
-                            ))}
-                        </ul>
+                        <table className='faculty-table'>
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Course</th>
+                                    <th>See course details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {courses.map(course => (course.enrollments
+                                    ?.map(enrollment => (
+                                        <tr key={enrollment.id}>
+                                            <td>{formatDate(enrollment.createdDate)}</td>
+                                            <td>{enrollment.amount}</td>
+                                            <td>{course.name}</td>
+                                            <td>
+                                                <Link to={`course-details/${course.id}`}>{course.id}</Link>
+                                            </td>
+                                        </tr>
+                                    ))))}
+                            </tbody>
+                        </table>
+
                     </div>
                 )
             case 'course':
                 return (
                     <div className="enquiries-section">
                         <h2>Courses</h2>
-                        <table>
+                        <table className='faculty-table'>
                             <thead>
                                 <tr>
                                     <th>Course</th>
                                     <th>Description</th>
-                                    <th></th>
+                                    <th>Total Sessions</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -157,25 +232,30 @@ const FacultyHomePage = () => {
                                     <tr key={course.id}>
                                         <td>{course.name}</td>
                                         <td>{course.description}</td>
+                                        <td>{course.totalSessions}</td>
                                         <td>
-                                            <button onClick={() => onClickNavigate(`course-details/${course.id}`)}>See course details</button>
+                                            <Link to={`course-details/${course.id}`}>See course details</Link>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                        <button>Create new batch</button>
                     </div>
                 )
             case 'batch':
                 return (
                     <div className="enquiries-section">
                         <h2>Batches</h2>
-                        <table>
+                        <table className='faculty-table'>
                             <thead>
                                 <tr>
                                     <th>Course</th>
                                     <th>Start Date</th>
                                     <th>End Date</th>
+                                    <th>Days left</th>
+                                    <th>Max quantity</th>
+                                    <th>Total Candidates</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -183,10 +263,14 @@ const FacultyHomePage = () => {
                                 {batches.map(batch => (
                                     <tr key={batch.id}>
                                         <td>{batch.course.name}</td>
-                                        <td>{batch.startDate}</td>
-                                        <td>{batch.endDate}</td>
+                                        <td>{formatDate(batch.startDate)}</td>
+                                        <td>{formatDate(batch.endDate)}</td>
+                                        <td>{calculateDaysLeft(batch.startDate, batch.endDate)}</td>
+                                        <td>{batch.quantity}</td>
+                                        <td>{batch.batchSessions[0]
+                                                ?.attendances.length}</td>
                                         <td>
-                                            <button onClick={() => onClickNavigate(`batch-details/${batch.id}`)}>See batch details</button>
+                                            <Link to={`batch-details/${batch.id}`}>See batch details</Link>
                                         </td>
                                     </tr>
                                 ))}
