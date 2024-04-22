@@ -30,6 +30,7 @@ const CandidateMyAccount = () => {
 
         setUserInfo(userInfoResponse.data);
         setBatches(batchesResponse.data);
+        console.log(batchesResponse)
         setCourses(batchesResponse.data.map(batch => {
             return {
               id: batch.course.id,

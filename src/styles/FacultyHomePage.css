@@ -1,0 +1,52 @@
+.admin-home-page {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .side-menu {
+    width: 200px;
+    background-color: #f0f0f0;
+  }
+  
+  .side-menu ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .side-menu li {
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .side-menu li.active {
+    background-color: #ddd;
+  }
+  
+  .enquiries {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .enquiries-section {
+    margin-bottom: 20px;
+  }
+  
+  .enquiries-section h2 {
+    margin-bottom: 10px;
+  }
+  
+  .enquiries-section ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .enquiries-section li {
+    padding: 5px 0;
+  }
+  
+  .faculty-table th,
+.faculty-table td {
+    padding: 10px; /* Adjust the padding value as needed */
+}
