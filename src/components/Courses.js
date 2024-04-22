@@ -27,6 +27,10 @@ const Courses = () => {
       navigate(`/checkout/${courseId}`);
     };
 
+    const handleDetail = (courseId) => {
+      navigate(`/details/${courseId}`)
+    }
+
     if (!courses) {
       return <div>Loading...</div>;
     }
@@ -36,7 +40,7 @@ const Courses = () => {
         <h2 className="mb-4" style={{ color: '#4caf50' }}>Courses</h2>
         <div className="row">
           {courses.map(course => (
-            <div key={course.id} className="col-lg-4 col-md-6 mb-4">
+            <div key={course.id} className="col-lg-4 col-md-6 mb-4" onClick={() => handleDetail(course.id)}>
               <div className="card h-100 course-card">
                 <img src={`${apiUrl}/course/images/${course.imageName}`} className="card-img-top course-image" alt="Course" />
                 <div className="card-body">

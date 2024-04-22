@@ -12,6 +12,8 @@ import PrivateRoute from './components/PrivateRoute';
 import CandidateMyAccount from './components/CandidateMyAccount';
 import CandidateLearn from './components/CandidateLearn';
 import CandidateInfoUpdate from './components/CandidateInfoUpdate';
+import CourseDetails from './components/CourseDetails';
+import FacultyHomePage from './components/FacultyHomePage';
 
 
 function App() {
@@ -36,6 +38,11 @@ function App() {
           <Route path="/" element={<Courses />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/details/:courseId" element={<CourseDetails />} />
+          <Route path="/admin" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
+              <FacultyHomePage />
+            </PrivateRoute>}
+          />
 
           <Route path="/my-account" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
               <CandidateMyAccount />
