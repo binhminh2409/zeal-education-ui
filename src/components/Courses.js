@@ -53,14 +53,12 @@ const Courses = () => {
             </div>
             <div className="row">
                 {filteredCourses.map(course => (
-                    <div
-                        key={course.id}
-                        className="col-lg-4 col-md-6 mb-4"
-                        onClick={() => handleDetail(course.id)}>
+                    <div key={course.id} className="col-lg-4 col-md-6 mb-4">
                         <div className="card h-100 course-card">
                             <img
                                 src={`${apiUrl}/course/images/${course.imageName}`}
                                 className="card-img-top course-image"
+                                onClick={() => handleDetail(course.id)}
                                 alt="Course"/>
                             <div className="card-body">
                                 <h5 className="card-title course-title">{course.name}</h5>

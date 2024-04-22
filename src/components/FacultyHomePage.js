@@ -3,7 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/FacultyHomePage.css';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -20,7 +20,7 @@ const FacultyHomePage = () => {
         setBatches] = useState([]);
     const [selectedMenu,
         setSelectedMenu] = useState('user');
-
+const navigate = useNavigate();
     useEffect(() => {
         const fetchEnquiries = async() => {
             const accessToken = Cookies.get('token');
@@ -63,6 +63,7 @@ const FacultyHomePage = () => {
 
     const formatDate = (dateString) => {
         const dateObject = new Date(dateString);
+        dateObject.setHours(dateObject.getHours() + 7);
 
         const year = dateObject.getFullYear();
         const month = String(dateObject.getMonth() + 1).padStart(2, '0');
@@ -98,6 +99,10 @@ const FacultyHomePage = () => {
         // Return the difference in days
         return differenceInDays;
     };
+
+    const handleNavigate = (url) => {
+        navigate(url)
+    }
 
     const renderEnquiries = () => {
         switch (selectedMenu) {
@@ -155,35 +160,7 @@ const FacultyHomePage = () => {
 
                     </div>
                 );
-            case 'course-enquiry':
-                return (
-                    <div className="enquiries-section">
-                        <h2>Course Enquiries</h2>
-                        <table className="faculty-table">
-                            <thead>
-                                <tr>
-                                    <th>Course ID</th>
-                                    <th>Event</th>
-                                    <th>Date</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {courseEnquiries.map(enquiry => (
-                                    <tr key={enquiry.id}>
-                                        <td>{enquiry.CourseId}</td>
-                                        <td>{formatDate(enquiry.createdDate)}</td>
-                                        <td>{enquiry.description}</td>
-                                        <td>
-                                            <Link to={`course-details/${enquiry.CourseId}`}>See Course Details</Link>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
-                    </div>
-                )
+           
             case 'enrollment':
                 return (
                     <div className="enquiries-section">
@@ -191,9 +168,10 @@ const FacultyHomePage = () => {
                         <table className='faculty-table'>
                             <thead>
                                 <tr>
-                                    <th>Amount</th>
                                     <th>Date</th>
+                                    <th>Amount</th>
                                     <th>Course</th>
+                                    <th>Status</th>
                                     <th>See course details</th>
                                 </tr>
                             </thead>
@@ -204,6 +182,7 @@ const FacultyHomePage = () => {
                                             <td>{formatDate(enrollment.createdDate)}</td>
                                             <td>{enrollment.amount}</td>
                                             <td>{course.name}</td>
+                                            <td>{enrollment.status}</td>
                                             <td>
                                                 <Link to={`course-details/${course.id}`}>{course.id}</Link>
                                             </td>
@@ -240,7 +219,7 @@ const FacultyHomePage = () => {
                                 ))}
                             </tbody>
                         </table>
-                        <button>Create new batch</button>
+                        <button onClick={() => handleNavigate("/faculty/course/create")}>Create new course</button>
                     </div>
                 )
             case 'batch':
@@ -300,11 +279,7 @@ const FacultyHomePage = () => {
                             ? 'active'
                             : ''}
                             onClick={() => handleMenuClick('batch-enquiry')}>Batch Enquiries</li>
-                        <li
-                            className={selectedMenu === 'course-enquiry'
-                            ? 'active'
-                            : ''}
-                            onClick={() => handleMenuClick('course-enquiry')}>Course Enquiries</li>
+                        
                         <li
                             className={selectedMenu === 'enrollment'
                             ? 'active'

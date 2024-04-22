@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/CourseDetails.css'
 
 const apiUrl = process.env.REACT_APP_API_URL;
