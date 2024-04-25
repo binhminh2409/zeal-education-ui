@@ -22,44 +22,44 @@ const FacultyHomePage = () => {
         setSelectedMenu] = useState('user');
 const navigate = useNavigate();
     useEffect(() => {
-        const fetchEnquiries = async() => {
-            const accessToken = Cookies.get('token');
-
-            // Add Authorization header th token
-            const axiosInstance = axios.create({
-                baseURL: apiUrl,
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            });
-            try {
-                // Fetch user enquiries
-                const userEnquiriesResponse = await axiosInstance.get('/admin/user-enquiry');
-                setUserEnquiries(userEnquiriesResponse.data);
-
-                // Fetch batch enquiries
-                const batchEnquiriesResponse = await axiosInstance.get('/admin/batch-enquiry');
-                setBatchEnquiries(batchEnquiriesResponse.data);
-
-                // Fetch course enquiries
-                const courseEnquiriesResponse = await axiosInstance.get('/admin/course-enquiry');
-                setCourseEnquiries(courseEnquiriesResponse.data);
-
-                // Fetch batches
-                const batchesResponse = await axiosInstance.get('/admin/batch');
-                setBatches(batchesResponse.data);
-
-                // Fetch courses
-                const coursesResponse = await axiosInstance.get('/course/full/all');
-                setCourses(coursesResponse.data);
-
-            } catch (error) {
-                console.error('Error fetching enquiries:', error);
-            }
-        };
-
         fetchEnquiries();
     }, []);
+
+    const fetchEnquiries = async() => {
+        const accessToken = Cookies.get('token');
+
+        // Add Authorization header th token
+        const axiosInstance = axios.create({
+            baseURL: apiUrl,
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            }
+        });
+        try {
+            // Fetch user enquiries
+            const userEnquiriesResponse = await axiosInstance.get('/admin/user-enquiry');
+            setUserEnquiries(userEnquiriesResponse.data);
+
+            // Fetch batch enquiries
+            const batchEnquiriesResponse = await axiosInstance.get('/admin/batch-enquiry');
+            setBatchEnquiries(batchEnquiriesResponse.data);
+
+            // Fetch course enquiries
+            const courseEnquiriesResponse = await axiosInstance.get('/admin/course-enquiry');
+            setCourseEnquiries(courseEnquiriesResponse.data);
+
+            // Fetch batches
+            const batchesResponse = await axiosInstance.get('/admin/batch');
+            setBatches(batchesResponse.data);
+
+            // Fetch courses
+            const coursesResponse = await axiosInstance.get('/course/full/all');
+            setCourses(coursesResponse.data);
+
+        } catch (error) {
+            console.error('Error fetching enquiries:', error);
+        }
+    };
 
     const formatDate = (dateString) => {
         const dateObject = new Date(dateString);
@@ -104,12 +104,32 @@ const navigate = useNavigate();
         navigate(url)
     }
 
+    const editCourse = (courseId) => {
+        navigate(`course-details/${courseId}/edit`);
+    }
+
+    const removeCourse = (courseId) => {
+        const accessToken = Cookies.get('token');
+
+            // Add Authorization header th token
+            const axiosInstance = axios.create({
+                baseURL: apiUrl,
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
+
+            axiosInstance.delete(`${apiUrl}/course/delete/${courseId}`).then(() => {
+                fetchEnquiries();
+            });
+    }
+
     const renderEnquiries = () => {
         switch (selectedMenu) {
             case 'user-enquiry':
                 return (
                     <div className="enquiries-section">
-                        <h2>User Enquiries</h2>
+                        <h2>User Activities</h2>
                         <table className="faculty-table">
                             <thead>
                                 <tr>
@@ -134,7 +154,7 @@ const navigate = useNavigate();
             case 'batch-enquiry':
                 return (
                     <div className="enquiries-section">
-                        <h2>Batch Enquiries</h2>
+                        <h2>Batch Activities</h2>
                         <table className="faculty-table">
                             <thead>
                                 <tr>
@@ -164,7 +184,7 @@ const navigate = useNavigate();
             case 'enrollment':
                 return (
                     <div className="enquiries-section">
-                        <h2>Enrollments</h2>
+                        <h2>Enrollments Activities</h2>
                         <table className='faculty-table'>
                             <thead>
                                 <tr>
@@ -203,7 +223,6 @@ const navigate = useNavigate();
                                     <th>Course</th>
                                     <th>Description</th>
                                     <th>Total Sessions</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -212,6 +231,8 @@ const navigate = useNavigate();
                                         <td>{course.name}</td>
                                         <td>{course.description}</td>
                                         <td>{course.totalSessions}</td>
+                                        <td><button className='btn btn-warning' onClick={() => editCourse(course.id)}>Edit course</button></td>
+                                        <td><button className='btn btn-danger' onClick={() => removeCourse(course.id)}>Remove course</button></td>
                                         <td>
                                             <Link to={`course-details/${course.id}`}>See course details</Link>
                                         </td>
@@ -219,7 +240,7 @@ const navigate = useNavigate();
                                 ))}
                             </tbody>
                         </table>
-                        <button onClick={() => handleNavigate("/faculty/course/create")}>Create new course</button>
+                        <button className='btn btn-primary' onClick={() => handleNavigate("/faculty/course/create")}>Create new course</button>
                     </div>
                 )
             case 'batch':
@@ -273,18 +294,18 @@ const navigate = useNavigate();
                             className={selectedMenu === 'user-enquiry'
                             ? 'active'
                             : ''}
-                            onClick={() => handleMenuClick('user-enquiry')}>User Enquiries</li>
+                            onClick={() => handleMenuClick('user-enquiry')}>User Activities</li>
                         <li
                             className={selectedMenu === 'batch-enquiry'
                             ? 'active'
                             : ''}
-                            onClick={() => handleMenuClick('batch-enquiry')}>Batch Enquiries</li>
+                            onClick={() => handleMenuClick('batch-enquiry')}>Batch Activities</li>
                         
                         <li
                             className={selectedMenu === 'enrollment'
                             ? 'active'
                             : ''}
-                            onClick={() => handleMenuClick('enrollment')}>Enrollments</li>
+                            onClick={() => handleMenuClick('enrollment')}>Enrollments Activities</li>
                         <li
                             className={selectedMenu === 'course'
                             ? 'active'

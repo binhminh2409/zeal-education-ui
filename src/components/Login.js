@@ -1,94 +1,109 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Import useNavigate for navigation
-
-import '../styles/Login.css'; // Import custom CSS file
+import React, {useEffect, useState} from 'react'
+import {Button} from './Button';
+import '../styles/Login.css'
+import {useNavigate} from "react-router-dom"
+import Cookies from 'js-cookie';
 
 const apiUrl = process.env.REACT_APP_API_URL;
-const loginUrl = `${apiUrl}/authentication/login`;
 
-const Login = ({ onLogin }) => {
-  const navigate = useNavigate(); // Initialize navigate for navigation
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
-  const [error, setError] = useState(null); // State to hold error message
-
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(loginUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const token = data.token;
-        const expiration = data.expiration; // Retrieve expiration from API response
-        document.cookie = `token=${token}; max-age=${expiration}; path=/`; // Set token and expiration in cookie
-        onLogin(); // Call the onLogin function passed as a prop
-        navigate('/'); // Navigate to homepage
-      } else {
-        console.error('Login failed');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('An error occurred'); // Set error message
+const Login = () => {
+    const [role,
+        setRole] = useState("Candidate");
+    const [username,
+        setUsername] = useState("");
+    const [password,
+        setPassword] = useState("");
+    let navigate = useNavigate();
+    useEffect(() => {
+        validateToken()
+    }, []);
+    async function validateToken() {
+        var token = Cookies.get('token');
+        if (token != null) {
+            var current = Math.round(Date.now() / 1000);
+            if (token.exp < current) {
+                Cookies.remove('token');
+            } else {
+                window
+                    .location
+                    .replace("/");
+            }
+        }
     }
-  };
 
-  return (
-    <div className="login-container">
-      <h2 className="login-title">Login</h2>
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="form-group">
-          <label htmlFor="username" className="form-label">
-            Username:
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password" className="form-label">
-            Password:
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">
-          Login
-          {error && <p className="error-message">{error}</p>} {/* Render error message if error state is not null */}
-        </button>
-      </form>
-      <p className="mt-3">Don't have an account? <Link to="/signup">Signup here</Link></p>
-    </div>
-  );
-};
+    async function login() {
+        //console.warn(email, password);
+        let item = {
+            username,
+            password
+        };
+        let result;
+        console.log(item)
+        fetch(apiUrl + "/authentication/login", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": 'application/json'
+            },
+            body: JSON.stringify(item)
+        }).then(response => {
+            if (!response.ok) {
+                throw response;
+            }
+            return response.json();
+        }).then(data => {
+            Cookies.set('token', data.token);
+            Cookies.set('expiration', data.expiration);
+            if (role == "Candidate") {
+                Cookies.set('role', 'Candidate');
+                window
+                    .location
+                    .replace("/");
+            } else {
+                Cookies.set('role', 'Faculty');
+                window
+                    .location
+                    .replace("/faculty");
+            }
+        }).catch(async(err) => {
+            let x = await err.json();
+            console.log(x.message);
+        });
+    }
+    return (
+        <div>
+            <div class='container'>
+                <h1>Welcome Back</h1>
+                <form action="" className="form-control">
+                    <div>
+                        <label htmlFor="email">Username*</label>
+                        <input
+                            type="text"
+                            name="email"
+                            onChange={(e) => setUsername(e.target.value)}
+                            id="email"
+                            placeholder="Enter Your Username"/>
+                    </div>
 
-export default Login;
+                    <div>
+                        <label htmlFor="password">Password*</label>
+                        <input
+                            type="password"
+                            name="password"
+                            onChange={(e) => setPassword(e.target.value)}
+                            id="password"
+                            placeholder="Enter Your Password"/>
+                    </div>
+                    <span>Log in as</span>
+                    <select name='role' onChange={(e) => setRole(e.target.value)}>
+                        <option value="Candidate">Candidate</option>
+                        <option value="Faculty">Teacher</option>
+                    </select>
+                    <Button onClick={login} className="btn" type="button">Log In</Button>
+                </form>
+            </div>
+        </div>
+    )
+}
+
+export default Login
