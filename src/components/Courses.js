@@ -1,81 +1,67 @@
-import React, {useState, useEffect} from 'react';
+import '../styles/Cards.css';
+import CardItem from './CardItem';
+import Carousel from 'react-multi-carousel';
+import 'react-multi-carousel/lib/styles.css';
+import React, {useEffect, useState} from 'react'
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../styles/Courses.css';
-import {useNavigate} from 'react-router-dom';
 
-const apiUrl = process.env.REACT_APP_API_URL;
+const apiUrl = process.env.REACT_APP_API_URL + "/course/all";
+const imgUrl = process.env.REACT_APP_API_URL + "/course/images/"
 
-const Courses = () => {
-    const navigate = useNavigate();
-    const [courses,
-        setCourses] = useState(null);
-    const [searchQuery,
-        setSearchQuery] = useState('');
+function Courses() {
+    const [searchTerm,
+        setSearchTerm] = useState('');
+
+    const [courseData,
+        setCourseData] = useState([]);
+    const [loading,
+        setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCourses = async() => {
-            try {
-                const response = await axios.get(apiUrl + '/course/all');
-                setCourses(response.data);
-            } catch (error) {
-                console.error('Error fetching courses:', error);
-            }
-        };
-
-        fetchCourses();
+        fetchData();
     }, []);
 
-    const handleBuy = (courseId) => {
-        navigate(`/checkout/${courseId}`);
+    const fetchData = async() => {
+        try {
+            const response = await axios.get(apiUrl);
+            setCourseData(response.data);
+            console.log(response.data)
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching course data:', error);
+            setLoading(false);
+        }
     };
 
-    const handleDetail = (courseId) => {
-        navigate(`/details/${courseId}`)
+    if (loading) {
+        return <div className="cards">Loading...</div>;
     }
 
-    const filteredCourses = courses
-        ? courses.filter(course => course.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        : [];
+    const handleSearch = (value) => {
+        setSearchTerm(value);
+    };
 
     return (
-        <div className="container mt-5">
-            <h2 className="mb-4" style={{
-                color: '#4caf50'
-            }}>Courses</h2>
-            <div className="mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search for a course..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}/>
-            </div>
-            <div className="row">
-                {filteredCourses.map(course => (
-                    <div key={course.id} className="col-lg-4 col-md-6 mb-4">
-                        <div className="card h-100 course-card">
-                            <img
-                                src={`${apiUrl}/course/images/${course.imageName}`}
-                                className="card-img-top course-image"
-                                onClick={() => handleDetail(course.id)}
-                                alt="Course"/>
-                            <div className="card-body">
-                                <h5 className="card-title course-title">{course.name}</h5>
-                                <p className="card-text course-description">{course.description}</p>
-                            </div>
-                            <div className="card-footer d-flex justify-content-between align-items-center">
-                                <small className="text-muted">Price:
-                                    <span className="badge bg-success ms-2 course-price">{course.price}</span>
-                                </small>
-                                <button className="btn btn-primary" onClick={() => handleBuy(course.id)}>Buy</button>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+        <div className="cards">
+            <h1>All Courses</h1>
+            <br></br>
+            {/* Search Bar */}
+            <input
+                className='mb-4'
+                type="text"
+                placeholder="Search..."
+                onChange={(e) => handleSearch(e.target.value)}/>
+            <br></br>
+            <div className="carddeck">
+                {courseData.filter((course) => course.name.toLowerCase().includes(searchTerm.toLowerCase())).map((course) => (<CardItem
+                    key={course.id}
+                    src={imgUrl + course.imageName}
+                    text={course.name}
+                    path={'/course-details/' + course.id}/>))}
+                {courseData.filter((course) => course.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && <p>No courses found</p>}
             </div>
         </div>
     );
-};
+}
 
 export default Courses;

@@ -1,76 +1,148 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
+import {Markup} from 'interweave';
 import axios from 'axios';
+import {useNavigate, useParams} from 'react-router-dom';
+import '../styles/CourseDetails.css'
+import {Button} from './Button';
+import Player from 'react-player';
 import Cookies from 'js-cookie';
-import '../styles/CandidateLearn.css'
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const CandidateLearn = () => {
-  const { batchId } = useParams()
-  const [courseData, setCourseData] = useState(null)
-  const [selectedSession, setSelectedSession] = useState(null);
+    const [attendance, setAttendance] = useState(false);
+    const navigate = useNavigate();
+    const [courseData,
+        setCourseData] = useState(null);
+    const {batchId} = useParams();
+    const [headerState,
+        setHeaderState] = useState(0);
 
-  const handleSessionClick = (sessionId) => {
-    setSelectedSession(sessionId);
-  };
+    useEffect(() => {
+        const fetchCourseData = async() => {
+            try {
+                var accessToken = Cookies.get('token');
+                const axiosInstance = axios.create({
+                    baseURL: apiUrl,
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const accessToken = Cookies.get('token'); 
-    
-            // Add Authorization header with token
-            const axiosInstance = axios.create({
-                baseURL: apiUrl,
-                headers: { Authorization: `Bearer ${accessToken}` },
-              });
-    
-            const courseDataResponse = await axiosInstance.get(`/candidate/learn/${batchId}`);
-            setCourseData(courseDataResponse.data);       
-          } catch (error) {
-            console.error(error);
-          }
+                const response = await axiosInstance.get(`${apiUrl}/candidate/learn/${batchId}`);
+                setCourseData(response.data);
+            } catch (error) {
+                console.error('Error fetching course data:', error);
+            }
         };
-    
-        fetchData();
+
+        fetchCourseData();
     }, [batchId]);
 
-    if(!courseData) {
+    if (!courseData) {
         return <div>Loading...</div>;
     }
 
+    const changeHeaderState = async(e, state) => {
+        e.preventDefault();
+        setHeaderState(state);
+    }
+
+    const handleAttend = (sessionId) => {
+        var accessToken = Cookies.get('token');
+                const axiosInstance = axios.create({
+                    baseURL: apiUrl,
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                  });
+                  axiosInstance.put(`${apiUrl}/candidate/update/attendance/${sessionId}`).then((res) => {
+                    setAttendance(true);
+                  });
+    }
+
+    function getYouTubeEmbedUrl(videoUrlString) {
+        const youtubeUrlRegex = /(?:https?:\/\/)?(?:www\.)?youtu(?:\.be|be\.com)\/(watch\?v=)?([^#&?]+)/;
+        const match = youtubeUrlRegex.exec(videoUrlString);
+
+        if (match) {
+            return `https://www.youtube.com/embed/${match[2]}`;
+        } else {
+            // Handle invalid video URL scenario (display error message or placeholder)
+            return '';
+        }
+    }
+
     return (
-        <div className="learning-container">
-          <h2>{courseData.name}</h2>
-          <div className="learning-content">
-            <div className="learning-menu">
-              <h3>Sessions</h3>
-              <ul>
-                {courseData.sessions.map((session) => (
-                  <li key={session.id} onClick={() => handleSessionClick(session.id)}>
-                    {session.name}
-                  </li>
-                ))}
-              </ul>
+        <div className="container border-0">
+            <div className="video-details">
+
+                <div className="details-nav">
+                    <ul className="details-nav-tabs">
+                        {courseData
+                            .sessions
+                            .map(session => (
+                                <li className="details-nav-tab" key={session.id}>
+                                    <a
+                                        className={headerState === session.id
+                                        ? 'details-nav-link active'
+                                        : 'details-nav-link'}
+                                        onClick={() => changeHeaderState(session.id)}>{session.name}</a>
+                                </li>
+                            ))}
+                    </ul>
+                </div>
+                <div className="nav-tab-info">
+                    {courseData
+                        .sessions
+                        .map((session, index) => (
+                            <div
+                                key={session.id}
+                                className={headerState === session.id
+                                ? 'active'
+                                : 'inactive'}>
+                                {index === 0
+                                    ? (
+                                        <div>
+                                            <h3 className='content-header'>{session.name}</h3>
+                                            <p>{session.description}</p>
+                                            <div className="sessions content">
+                                                {session.resources
+                                                    ? (
+                                                        <div className="session">
+                                                            {session
+                                                                .resources
+                                                                .map(resource => (
+                                                                    <div key={resource.id}>
+                                                                        {resource.type === "Video URL" && (
+                                                                            <div className="video-section">
+                                                                                <Player url={`${apiUrl}/course/resources/${resource.fileName}`} controls width="560px" height="315px" />
+                                                                            </div>
+                                                                        )}
+                                                                        {resource.type === "Text" && (<div
+                                                                            dangerouslySetInnerHTML={{
+                                                                            __html: resource.fileName
+                                                                        }}/>)}
+                                                                    </div>
+                                                                ))}
+                                                        </div>
+                                                    )
+                                                    : (
+                                                        <span></span>
+                                                    )}
+                                            </div>
+                                        </div>
+                                    )
+                                    : (
+                                        <div>
+                                            <h3 className='content-header'>{session.name}</h3>
+                                            <p>{session.description}</p>
+                                        </div>
+                                    )}
+                            </div>
+                        ))}
+
+                </div>
             </div>
-            <div className="learning-main">
-              <h3>Resources</h3>
-              {selectedSession && (
-                <ul>
-                  {courseData.sessions
-                    .find((session) => session.id === selectedSession)
-                    .resources.map((resource) => (
-                      <li key={resource.id}>
-                        <a href={resource.filePath} target="_blank" rel="noreferrer">
-                          {resource.name}
-                        </a>
-                      </li>
-                    ))}
-                </ul>
-              )}
+            <div>
+                <Button onClick={() => handleAttend(courseData.id)}>Attend</Button>
             </div>
-          </div>
         </div>
     );
 };

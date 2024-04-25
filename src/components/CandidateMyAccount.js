@@ -27,24 +27,12 @@ const CandidateMyAccount = () => {
 
         const userInfoResponse = await axiosInstance.get('/candidate/user-info');
         const batchesResponse = await axiosInstance.get(`${apiUrl}/candidate/find/batch/all`);
+        const courseResponse = await axiosInstance.get(`${apiUrl}/candidate/find/course/all`)
 
         setUserInfo(userInfoResponse.data);
         setBatches(batchesResponse.data);
-        console.log(batchesResponse)
-        setCourses(batchesResponse.data.map(batch => {
-            return {
-              id: batch.course.id,
-              name: batch.course.name,
-              imageName: batch.course.imageName,
-              description: batch.course.description,
-              totalSessions: batch.course.totalSessions,
-              price: batch.course.price,
-            };
-          }));        
 
-        // Set selected tab based on URL path (optional for initial selection)
-        // const urlPath = location.pathname.split('/').pop();
-        // setSelectedTab(urlPath || 'personal-info'); // Default to personal-info
+        setCourses(courseResponse.data);   
       } catch (error) {
         console.error(error);
       }
@@ -85,10 +73,6 @@ const CandidateMyAccount = () => {
                   <h4 className="course-name">{course.name}</h4>
                   <p className="course-description">{course.description}</p>
                   <ul className="course-params">
-                    <li>
-                      <span className="param-label">Image:</span>
-                      <span className="param-value">{course.imageName}</span>
-                    </li>
                     <li>
                       <span className="param-label">Total Sessions:</span>
                       <span className="param-value">{course.totalSessions}</span>
@@ -174,7 +158,7 @@ const CandidateMyAccount = () => {
       );
     default:
       return null;
-  }
+  };
 };
 
 

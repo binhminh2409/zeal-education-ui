@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, {useState, useEffect} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 import '../styles/Checkout.css';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
 const apiUrl = process.env.REACT_APP_API_URL;
+const imgUrl = process.env.REACT_APP_API_URL + "/course/images/"
 
 function Checkout() {
     const navigate = useNavigate();
-    const { courseId } = useParams();
-    const [course, setCourse] = useState(null);
-    const [formData, setFormData] = useState({ amount: '', note: '' });
+    const {courseId} = useParams();
+    const [course,
+        setCourse] = useState(null);
+    const [formData,
+        setFormData] = useState({amount: '', note: ''});
 
     useEffect(() => {
         // Fetch course data using courseId
@@ -20,7 +23,7 @@ function Checkout() {
             .catch(error => console.error('Error fetching course:', error));
     }, [courseId]);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault();
         try {
             const accessToken = Cookies.get('token');
@@ -40,8 +43,8 @@ function Checkout() {
                 note: formData.note
             });
 
-            if (response.status === 200) {
-                navigate("my-account");
+            if (response.status === 201) {
+                navigate("/my-account");
             } else {
                 console.error(response);
                 // Handle payment failure
@@ -53,7 +56,7 @@ function Checkout() {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prevState => ({
             ...prevState,
             [name]: value
@@ -65,32 +68,65 @@ function Checkout() {
     }
 
     return (
-        <div className="container-checkout">
-            <h2>Checkout</h2>
-            <div>
-                <h3>{course.name}</h3>
-                <img
-                    src={`${apiUrl}/course/images/${course.imageName}`}
-                    className="card-img-top course-image"
-                    alt="Course" />
-                <p>{course.description}</p>
-                <p>Price: {course.price}</p>
+        <div className="page-container">
+            <div className="item-container">
+                <div className="item-image">
+                    <img src={imgUrl + course.imageName}/>
+                    <div className='mx-auto item-details '>
+                        <h2>
+                            {course.name}
+                        </h2>
+                        <p className='item-price'>
+                            Price: ${course.price}
+                        </p>
+                        <p>
+                            Total Sessions: {course.totalSessions}
+                        </p>
+                    </div>
+                </div>
             </div>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="amount">Amount: {course.price}</label>
+
+            <div className="checkout">
+                <div className="checkout-container">
+                    <form>
+                        <h3 className="heading-3">Credit card checkout</h3>
+                        <div className="input">
+                            <label>Cardholder's name</label>
+                            <div className="input-field">
+                                <input onChange={(event) => handleChange(event)} type='text' name='name'/>
+                            </div>
+                        </div>
+
+                        <div className="input">
+                            <label>Card Number</label>
+                            <div className="input-field">
+                                <input onChange={(event) => handleChange(event)} type='number' name='card_number'/>
+                                <img src="https://seeklogo.com/images/V/visa-logo-6F4057663D-seeklogo.com.png"/>
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div className="col">
+                                <div className="input">
+                                    <label>Expiration Date</label>
+                                    <div className="input-field">
+                                        <input onChange={(event) => handleChange(event)} type='month' name='exp_date'/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col">
+                                <div className="input">
+                                    <label>CVV</label>
+                                    <div className="input-field">
+                                        <input onChange={(event) => handleChange(event)} type='number' name='cvv'/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button className="checkout-btn" onClick={handleSubmit} type="button">Purchase</button>
+                    </form>
                 </div>
-                <div className="form-group">
-                    <label htmlFor="note">Note:</label>
-                    <textarea
-                        id="note"
-                        name="note"
-                        value={formData.note}
-                        onChange={handleChange}
-                        className="form-control"></textarea>
-                </div>
-                <button type="submit" className="btn btn-primary">Submit</button>
-            </form>
+            </div>
         </div>
     );
 }

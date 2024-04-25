@@ -1,0 +1,14 @@
+.course-container{
+    padding: 30px 10%;
+}
+
+.resources, .sessions {
+    padding: 2% 1% 2% 5%;
+    border: solid 0.5px;
+    border-color: gray;
+    border-radius: 10px;
+}
+
+.btn-red{
+    color:red!important;
+}

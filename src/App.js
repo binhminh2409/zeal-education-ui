@@ -17,19 +17,17 @@ import FacultyHomePage from './components/FacultyHomePage';
 import FacultyCourseDetails from './components/FacultyCourseDetails';
 import FacultyCourseEdit from './components/FacultyCourseEdit';
 import CreateCourse from './components/CreateCourse';
-
+import Logout from './components/Logout';
+import CreateBatch from './components/CreateBatch';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!Cookies.get('token'));
 
   const handleLogin = () => {
-    // Login logic (set token in cookie)
     setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
-    // Logout logic (remove token from cookie)
-    Cookies.remove('token');
     setIsLoggedIn(false);
   };
 
@@ -40,8 +38,12 @@ function App() {
         <Routes>
           <Route path="/" element={<Courses />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/logout" element={<Logout onLogout={handleLogout}/>} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/details/:courseId" element={<CourseDetails />} />
+          <Route path="/course-details/:courseId" element={<CourseDetails />} />
+          
+          <Route path="/create" element={<CreateCourse />} />
+
           <Route path="/faculty" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
               <FacultyHomePage />
             </PrivateRoute>}
@@ -73,7 +75,7 @@ function App() {
             </PrivateRoute>}
           />
           <Route path="/faculty/batch/create" element={<PrivateRoute isLoggedIn={isLoggedIn}> 
-              <FacultyHomePage />
+              <CreateBatch />
             </PrivateRoute>}
           />
 
